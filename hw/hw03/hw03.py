@@ -231,9 +231,30 @@ def move_stack(n, start, end):
     Move the top disk from rod 2 to rod 1
     Move the top disk from rod 2 to rod 3
     Move the top disk from rod 1 to rod 3
+    >>> move_stack(4, 1, 3)
+    Move the top disk from rod 1 to rod 2
+    Move the top disk from rod 3 to rod 1
+    Move the top disk from rod 3 to rod 2
+    Move the top disk from rod 1 to rod 2
+    Move the top disk from rod 1 to rod 3
+    Move the top disk from rod 2 to rod 3
+    Move the top disk from rod 2 to rod 1
+    Move the top disk from rod 3 to rod 1
+    Move the top disk from rod 2 to rod 3
+    Move the top disk from rod 1 to rod 2
+    Move the top disk from rod 1 to rod 3
+    Move the top disk from rod 2 to rod 3
     """
-    assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
-    middle = end - start - 
+    middle = 6 - start - end
+    if n == 1:
+        return print_move(start, end)
+    else:
+        move_stack(n-1, start, middle)
+        print_move(start, end)
+        move_stack(n-1, middle, end)
+        
+        
+
     
 
 
