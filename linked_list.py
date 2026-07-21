@@ -68,3 +68,61 @@ def add(s, v):
     elif s.first < v:
         add(s.rest, v)
     return s
+
+def check_ordered(t, key=lambda x: x):
+    """Check whether list s ordered from least to greatest.
+    >>> t = Link(1, Link(3, Link(4)))
+    >>> check_ordered(t)
+    True
+    >>> t = Link(1, Link(4, Link(3)))
+    >>> check_ordered(t)
+    False
+    """
+    if t is Link.empty or t.rest is Link.empty:
+        return True
+    elif key(t.first) > key(t.rest.first):
+        return False
+    else:
+        return check_ordered(t.rest)
+    
+def merge(s, t):
+    """Return a sorted link with the elements of sorted s & t.
+    >>> a = Link(1, Link(5))
+    >>> b = Link(1, Link(4))
+    >>> merge(a, b)
+    Link(1, Link(1, Link(4, Link(5))))
+    >>> a
+    Link(1, Link(5))
+    >>> b
+    Link(1, Link(4))
+    """
+    if s is Link.empty:
+        return t
+    elif t is Link.empty:
+        return s
+    elif s.first <= t.first:
+        return Link(s.first, merge(s.rest, t))
+    else:
+        return Link(t.first, merge(s, t.rest))
+    
+def merge_in_place(s, t):
+    """Return a sorted Link with the elements from sorted s & t.
+    >>> a = Link(1, Link(5))
+    >>> b = Link(1, Link(4))
+    >>> merge(a, b)
+    Link(1, Link(1, Link(4, Link(5))))
+    >>> a
+    Link(1, Link(5))
+    >>> b
+    Link(1, Link(4))
+    """
+    if s is Link.empty:
+        return t
+    elif t is Link.empty:
+        return s
+    elif s.first <= t.first:
+        s.rest = merge_in_place(s.rest, t)
+        return s
+    else:
+        t.rest = merge_in_place(s, t.rest)
+        return t
