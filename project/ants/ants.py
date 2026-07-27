@@ -470,12 +470,29 @@ class SlowThrower(ThrowerAnt):
     name = 'Slow'
     food_cost = 6
     # BEGIN Problem EC 1
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem EC 1
+    turns = 5
 
     def throw_at(self, target):
-        # BEGIN Problem EC 1
-        "*** YOUR CODE HERE ***"
+        if target is not None:
+            target.slow_turns = self.turns
+
+        def slow_action(gamestate):
+            if target.slow_turns > 0:
+                target.slow_turns -=1
+                if gamestate.time % 2 == 0:
+                    target.is_slowed = False
+                    Bee.action(target, gamestate)
+                else:
+                    target.is_slowed = True
+            else:
+                target.is_slowed = False
+                Bee.action(target, gamestate)
+        target.action = slow_action
+            
+    def action(self, gamestate):
+        self.throw_at(self.nearest_bee())
         # END Problem EC 1
 
 
@@ -485,12 +502,30 @@ class ScaryThrower(ThrowerAnt):
     name = 'Scary'
     food_cost = 6
     # BEGIN Problem EC 2
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem EC 2
+    turns = 2
+
+    
 
     def throw_at(self, target):
         # BEGIN Problem EC 2
-        "*** YOUR CODE HERE ***"
+        def scary_action(gamestate):
+            if not target.already_scared:
+                Bee.scare(target, length=self.turns)
+                target.already_scared = True
+
+            target.scaring = True
+
+            if target.scared_turns > 0:
+                Bee.action(target, gamestate)
+                target.scared_turns -= 1
+            else:
+                Bee.action(target, gamestate)
+        target.action = scary_action
+
+    def action(self, gamestate):
+        self.throw_at(self.nearest_bee())
         # END Problem EC 2
 
 
@@ -554,7 +589,9 @@ class Bee(Insect):
     name = 'Bee'
     damage = 1
     is_waterproof = True
-
+    is_slowed = False
+    already_scared = False
+    scared_turns = 0
 
     def sting(self, ant):
         """Attack an ANT, reducing its health by 1."""
@@ -579,10 +616,13 @@ class Bee(Insect):
         gamestate -- The GameState, used to access game state information.
         """
         destination = self.place.exit
-
+        back_place = self.place.entrance
 
         if self.blocked():
             self.sting(self.place.ant)
+        elif self.scared_turns > 0 and not self.is_slowed:
+            if back_place and not back_place.is_hive:
+                self.move_to(back_place)
         elif self.health > 0 and destination is not None:
             self.move_to(destination)
 
@@ -600,7 +640,8 @@ class Bee(Insect):
         go backwards LENGTH times.
         """
         # BEGIN Problem EC 2
-        "*** YOUR CODE HERE ***"
+        if not self.already_scared:
+            self.scared_turns = length
         # END Problem EC 2
 
 
